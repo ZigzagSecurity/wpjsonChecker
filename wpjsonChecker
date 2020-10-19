@@ -1,0 +1,369 @@
+#!/usr/bin/ruby
+
+require "httparty"
+require "json"
+require "colorize"
+
+def greetings()
+    puts " 
+    ██╗    ██╗██████╗     ██╗███████╗ ██████╗ ███╗   ██╗ ██████╗██╗  ██╗███████╗ ██████╗██╗  ██╗███████╗██████╗ 
+    ██║    ██║██╔══██╗    ██║██╔════╝██╔═══██╗████╗  ██║██╔════╝██║  ██║██╔════╝██╔════╝██║ ██╔╝██╔════╝██╔══██╗
+    ██║ █╗ ██║██████╔╝    ██║███████╗██║   ██║██╔██╗ ██║██║     ███████║█████╗  ██║     █████╔╝ █████╗  ██████╔╝
+    ██║███╗██║██╔═══╝██   ██║╚════██║██║   ██║██║╚██╗██║██║     ██╔══██║██╔══╝  ██║     ██╔═██╗ ██╔══╝  ██╔══██╗
+    ╚███╔███╔╝██║    ╚█████╔╝███████║╚██████╔╝██║ ╚████║╚██████╗██║  ██║███████╗╚██████╗██║  ██╗███████╗██║  ██║
+     ╚══╝╚══╝ ╚═╝     ╚════╝ ╚══════╝ ╚═════╝ ╚═╝  ╚═══╝ ╚═════╝╚═╝  ╚═╝╚══════╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
+                                                                                          by ZigzagSecurity v0.1".yellow
+
+
+puts "Color meaning:"
+puts "Green: The request succeeded".green
+puts "Yellow: You should check this endpoint by hand".yellow
+puts "Red: The request has not been authorized".red
+puts "\n\n\n"
+end
+
+def check_argv()
+    if ARGV[0] == nil
+        puts "ERROR: no argument given.".red
+        exit
+    end
+end
+
+def get_all_routes(json_file)
+    return all_routes = json_file["routes"] 
+end
+
+
+def number1(json_file)
+    #puts json_file
+    puts "name = #{json_file['name']}".green
+    puts "description = #{json_file['description']}".green
+    puts "url = #{json_file['routes']['/']['_links']['self']}".green
+    puts
+
+
+
+    all_routes = get_all_routes(json_file)
+    all_routes.each do |key, value|
+        puts "Route : #{key}".blue
+        found = false
+
+        # check if there is a link 
+        if value["_links"] != nil
+            link = value["_links"]["self"]
+            found = true
+        else
+            link = "There is no link. You should check by hand."
+        end
+
+        # check the methods available 
+        methods = value["methods"]
+        methods.each do |k, v|
+            if found
+                code = 0
+                case k
+                when "GET"
+                    response = HTTParty.get(link, follow_redirects: false) 
+                    code = response.code
+                when "POST"
+                    response = HTTParty.post(link, body: {foo: 'bar'}, follow_redirects: false)
+                    code = response.code
+                when "HEAD"
+                    response = HTTParty.head(link, follow_redirects: false)
+                    code = response.code
+                when "PUT"
+                    response = HTTParty.put(link, follow_redirects: false)
+                    code = response.code
+                when "DELETE"
+                    response = HTTParty.delete(link, follow_redirects: false)
+                    code = response.code
+                when "OPTIONS"
+                    response = HTTParty.options(link, follow_redirects: false)
+                    code = response.code
+                when "PATCH"
+                    response = HTTParty.patch(link, follow_redirects: false)
+                    code = response.code
+                end
+                if code == 401 or code == 403 or code == 404
+                    puts "Method : #{k} ---> response code = #{code}".red
+                elsif code == 200
+                    puts "Method : #{k} ---> response code = #{code}".green
+                else 
+                    puts "Method : #{k} ---> response code = #{code}".yellow
+                end
+            else
+                puts "Method : #{k}"
+            end
+        end
+
+        # put the link 
+        if link == "There is no link. You should check by hand."
+            puts "---> [ #{link} ]".yellow
+        else
+            puts "---> [ #{link} ]"
+        end
+
+        # create space
+        puts "\n\n\n"
+    end
+    exit
+end
+
+# if _links is replaced by meta
+def number2(json_file)
+    #puts json_file
+    puts "name = #{json_file['name']}".green
+    puts "description = #{json_file['description']}".green
+    puts "url = #{json_file['routes']['/']['meta']['self']}".green
+    puts
+
+
+
+    all_routes = get_all_routes(json_file)
+    all_routes.each do |key, value|
+        puts "Route : #{key}".blue
+        found = false
+
+        # check if there is a link 
+        if value["meta"] != nil
+            link = value["meta"]["self"]
+            found = true
+        else
+            link = "There is no link. You should check by hand."
+        end
+
+        # check the methods available 
+        methods = value["supports"]
+        methods.each do |k, v|
+            if found
+                code = 0
+                case k
+                when "GET"
+                    response = HTTParty.get(link, follow_redirects: false) 
+                    code = response.code
+                when "POST"
+                    response = HTTParty.post(link, body: {foo: 'bar'}, follow_redirects: false)
+                    code = response.code
+                when "HEAD"
+                    response = HTTParty.head(link, follow_redirects: false)
+                    code = response.code
+                when "PUT"
+                    response = HTTParty.put(link, follow_redirects: false)
+                    code = response.code
+                when "DELETE"
+                    response = HTTParty.delete(link, follow_redirects: false)
+                    code = response.code
+                when "OPTIONS"
+                    response = HTTParty.options(link, follow_redirects: false)
+                    code = response.code
+                when "PATCH"
+                    response = HTTParty.patch(link, follow_redirects: false)
+                    code = response.code
+                end
+                if code == 401 or code == 403 or code == 404
+                    puts "Method : #{k} ---> response code = #{code}".red
+                elsif code == 200
+                    puts "Method : #{k} ---> response code = #{code}".green
+                else 
+                    puts "Method : #{k} ---> response code = #{code}".yellow
+                end
+            else
+                puts "Method : #{k}"
+            end
+        end
+
+        # put the link 
+        if link == "There is no link. You should check by hand."
+            puts "---> [ #{link} ]".yellow
+        else
+            puts "---> [ #{link} ]"
+        end
+
+        # create space
+        puts "\n\n\n"
+    end
+    exit
+end
+
+# if the link is in an array
+def number3(json_file)
+    #puts json_file
+    puts "name = #{json_file['name']}".green
+    puts "description = #{json_file['description']}".green
+    puts "url = #{json_file['routes']['/']['_links']['self'][0]["href"]}".green
+    puts
+
+
+
+    all_routes = get_all_routes(json_file)
+    all_routes.each do |key, value|
+        puts "Route : #{key}".blue
+        found = false
+
+        # check if there is a link 
+        if value["_links"] != nil
+            link = value['_links']['self'][0]["href"]
+            found = true
+        else
+            link = "There is no link. You should check by hand."
+        end
+
+        # check the methods available 
+        methods = value["methods"]
+        methods.each do |k, v|
+            if found
+                code = 0
+                case k
+                when "GET"
+                    response = HTTParty.get(link, follow_redirects: false) 
+                    code = response.code
+                when "POST"
+                    response = HTTParty.post(link, body: {foo: 'bar'}, follow_redirects: false)
+                    code = response.code
+                when "HEAD"
+                    response = HTTParty.head(link, follow_redirects: false)
+                    code = response.code
+                when "PUT"
+                    response = HTTParty.put(link, follow_redirects: false)
+                    code = response.code
+                when "DELETE"
+                    response = HTTParty.delete(link, follow_redirects: false)
+                    code = response.code
+                when "OPTIONS"
+                    response = HTTParty.options(link, follow_redirects: false)
+                    code = response.code
+                when "PATCH"
+                    response = HTTParty.patch(link, follow_redirects: false)
+                    code = response.code
+                end
+                if code == 401 or code == 403 or code == 404
+                    puts "Method : #{k} ---> response code = #{code}".red
+                elsif code == 200
+                    puts "Method : #{k} ---> response code = #{code}".green
+                else 
+                    puts "Method : #{k} ---> response code = #{code}".yellow
+                end
+            else
+                puts "Method : #{k}"
+            end
+        end
+
+        # put the link 
+        if link == "There is no link. You should check by hand."
+            puts "---> [ #{link} ]".yellow
+        else
+            puts "---> [ #{link} ]"
+        end
+
+        # create space
+        puts "\n\n\n"
+    end
+    exit
+end
+
+# if the link is in self but not in an array
+def number4(json_file)
+    #puts json_file
+    puts "name = #{json_file['name']}".green
+    puts "description = #{json_file['description']}".green
+    puts "url = #{json_file['routes']['/']['_links']['self']}".green
+    puts
+
+
+
+    all_routes = get_all_routes(json_file)
+    all_routes.each do |key, value|
+        puts "Route : #{key}".blue
+        found = false
+
+        # check if there is a link 
+        if value["_links"] != nil
+            link = value['_links']['self']
+            found = true
+        else
+            link = "There is no link. You should check by hand."
+        end
+
+        # check the methods available 
+        methods = value["methods"]
+        methods.each do |k, v|
+            if found
+                code = 0
+                case k
+                when "GET"
+                    response = HTTParty.get(link, follow_redirects: false) 
+                    code = response.code
+                when "POST"
+                    response = HTTParty.post(link, body: {foo: 'bar'}, follow_redirects: false)
+                    code = response.code
+                when "HEAD"
+                    response = HTTParty.head(link, follow_redirects: false)
+                    code = response.code
+                when "PUT"
+                    response = HTTParty.put(link, follow_redirects: false)
+                    code = response.code
+                when "DELETE"
+                    response = HTTParty.delete(link, follow_redirects: false)
+                    code = response.code
+                when "OPTIONS"
+                    response = HTTParty.options(link, follow_redirects: false)
+                    code = response.code
+                when "PATCH"
+                    response = HTTParty.patch(link, follow_redirects: false)
+                    code = response.code
+                end
+                if code == 401 or code == 403 or code == 404 or code == 301 or code == 302
+                    puts "Method : #{k} ---> response code = #{code}".red
+                elsif code == 200
+                    puts "Method : #{k} ---> response code = #{code}".green
+                else 
+                    puts "Method : #{k} ---> response code = #{code}".yellow
+                end
+            else
+                puts "Method : #{k}"
+            end
+        end
+
+        # put the link 
+        if link == "There is no link. You should check by hand."
+            puts "---> [ #{link} ]".yellow
+        else
+            puts "---> [ #{link} ]"
+        end
+
+        # create space
+        puts "\n\n\n"
+    end
+    exit
+end
+
+# Main 
+greetings()
+check_argv()
+
+# Handle the error when the website answer with json directly
+begin  
+    json_file = JSON.parse(HTTParty.get(ARGV[0]))
+    #puts json_file
+  rescue  
+    json_file = HTTParty.get(ARGV[0], headers: {"Accept" => "application/json"}) 
+    #puts json_file
+end  
+
+
+if json_file.has_key?("self")
+    puts "true"
+else
+    puts "false"
+end 
+
+# Check which vesion of the API the website is using
+if json_file.has_key?("meta")
+    number2(json_file)
+elsif json_file['routes']['/']['_links']["self"].class.to_s == "Array"
+    number3(json_file)
+elsif json_file['routes']['/']['_links']["self"] != nil
+    number4(json_file)
+else
+    number1(json_file)
+end

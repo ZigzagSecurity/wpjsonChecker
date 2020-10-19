@@ -8,7 +8,7 @@ A tool to check the wp-json API of a wordpress website
 
 Example : `wpjsonchecker http://wordpress.example/wp-json/`
 
-![example](https://imgur.com/a/2veygpS)
+![example](https://user-images.githubusercontent.com/40743997/96457040-95b6bf80-121f-11eb-966d-4bba52c20668.png)
 
 # Notes
 Any feedback, bug or improvement is welcome, feel free to contact me in any case :)

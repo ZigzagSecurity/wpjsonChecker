@@ -350,13 +350,6 @@ begin
     #puts json_file
 end  
 
-
-if json_file.has_key?("self")
-    puts "true"
-else
-    puts "false"
-end 
-
 # Check which vesion of the API the website is using
 if json_file.has_key?("meta")
     number2(json_file)

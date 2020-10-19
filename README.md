@@ -5,6 +5,7 @@ A tool to check the wp-json API of a wordpress website
 1. Clone this repository
 2. Install the dependencies `sudo gem install httparty json colorize`
 3. Check a website with this command `wpjsonChecker [address to the wpjson page]`
+
 Example : `wpjsonchecker http://wordpress.example/wp-json/`
 
 # Notes
